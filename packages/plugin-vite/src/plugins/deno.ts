@@ -1,4 +1,5 @@
 import type { Plugin } from "vite";
+import type { ModuleType } from "rolldown";
 import {
   type Loader,
   MediaType,
@@ -11,6 +12,7 @@ import * as babel from "@babel/core";
 import babelReact from "@babel/preset-react";
 import { httpAbsolute } from "./patches/http_absolute.ts";
 import { JS_REG, JSX_REG } from "../utils.ts";
+import { moduleType } from "rolldown/filter";
 
 interface DenoState {
   type: RequestedModuleType;
@@ -163,6 +165,7 @@ export function deno(): Plugin {
         }
 
         return {
+          moduleType: result.mediaType === MediaType.Json ? "json" : "js",
           code,
         };
       }
@@ -208,6 +211,7 @@ export function deno(): Plugin {
 
       return {
         code,
+        moduleType: mediaTypeToModuleType(result.mediaType),
       };
     },
     transform: {
@@ -252,6 +256,7 @@ export function deno(): Plugin {
 
         return {
           code,
+          moduleType: mediaTypeToModuleType(result.mediaType),
         };
       },
     },
@@ -377,8 +382,40 @@ function babelTransform(
     return {
       code: result.code,
       map: result.map,
+      moduleType: mediaTypeToModuleType(options.media),
     };
   }
 
   return null;
+}
+
+function mediaTypeToModuleType(mediaType: MediaType): ModuleType {
+  switch (mediaType) {
+    case MediaType.JavaScript:
+    case MediaType.Mjs:
+    case MediaType.Cjs:
+      return "js";
+    case MediaType.Jsx:
+      return "jsx";
+    case MediaType.TypeScript:
+    case MediaType.Mts:
+    case MediaType.Cts:
+    case MediaType.Dts:
+    case MediaType.Dmts:
+    case MediaType.Dcts:
+      return "ts";
+    case MediaType.Tsx:
+      return "tsx";
+    case MediaType.Json:
+      return "json";
+    case MediaType.Wasm:
+      return "binary";
+    case MediaType.Css:
+    case MediaType.Html:
+    case MediaType.Sql:
+    case MediaType.SourceMap:
+    case MediaType.Unknown:
+      // Default to text for unsupported types
+      return "text";
+  }
 }
