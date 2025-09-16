@@ -236,9 +236,10 @@ re-use existing objects internally as a minor performance optimization.
 
 ### `ctx.render()`
 
-The meaning of `ctx.render()` has changed. In Fresh 1.x this was used to pass
+The *meaning* of `ctx.render()` has changed. In Fresh 1.x this was used to pass
 data from a handler to a component. In Fresh 2.x this function has been
-generalized to render JSX.
+generalized to render JSX, so it's no longer needed to pass data from a handler
+to a component.
 
 Fresh 1.x:
 
@@ -255,7 +256,7 @@ export default function Page({ data }) {
 }
 ```
 
-Fresh 2:
+Fresh 2 (removed):
 
 ```ts
 export const handlers = {
