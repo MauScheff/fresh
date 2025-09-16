@@ -157,8 +157,9 @@ accordingly.
 
 ## Update deployment settings
 
-Fresh 2 requires assets to be build during deployment instead of building them
-on demand. Run the `deno task build` command as part of your deployment process.
+Fresh 2 requires assets to be built during deployment instead of building them
+on demand. Run the `deno task build` or `deno run build` command as part of your deployment process.
+
 If you have already set up Fresh's 1.x "Ahead-of-Time Builds", then no changes
 are necessary.
 
