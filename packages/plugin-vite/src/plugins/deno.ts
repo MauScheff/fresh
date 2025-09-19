@@ -11,6 +11,9 @@ import * as babel from "@babel/core";
 import babelReact from "@babel/preset-react";
 import { httpAbsolute } from "./patches/http_absolute.ts";
 import { JS_REG, JSX_REG } from "../utils.ts";
+import { builtinModules } from "node:module";
+
+const BUILTINS = new Set(builtinModules);
 
 interface DenoState {
   type: RequestedModuleType;
@@ -49,6 +52,16 @@ export function deno(): Plugin {
       return true;
     },
     async resolveId(id, importer, options) {
+      if (BUILTINS.has(id)) {
+        // `node:` prefix is not included in builtins list.
+        if (!id.startsWith("node:")) {
+          id = `node:${id}`;
+        }
+        return {
+          id,
+          external: true,
+        };
+      }
       const loader = options?.ssr ? ssrLoader : browserLoader;
 
       const original = id;
